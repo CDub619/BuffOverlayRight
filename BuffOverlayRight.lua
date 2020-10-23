@@ -55,12 +55,16 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 --**Class Perm Passive Buffs **--
 
 2645, --Ghost Wolf
-232698, --Shadowform
 197690, --Defensive Stance
-199261, --Death Wish
 5487, --Bear Form
+201940, --Protector of the Pack
+204205, --Wild Protector
 768, --Cat Form
 783, --Travel Form
+199261, --Death Wish
+232698, --Shadowform
+
+
 }
 
 for k, v in ipairs(prioritySpellList) do
