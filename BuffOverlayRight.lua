@@ -61,6 +61,8 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 204205, --Wild Protector
 768, --Cat Form
 783, --Travel Form
+24858, --Moonkin Form
+197625, --Moonkin Form
 199261, --Death Wish
 232698, --Shadowform
 
