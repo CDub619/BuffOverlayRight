@@ -41,6 +41,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 57934, --Tricks of the Trade
 "Misdirection",
+--10060, --Power Infusion
 
 --** Secondary’ Class Ds**--
 
