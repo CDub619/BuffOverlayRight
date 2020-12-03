@@ -49,23 +49,39 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 277187, --Gladiator’s Emblem
 193065, --Masochism
 "Spirit Mend",
+
+--**Class Perm Passive Buffs & DMG CDs**--
+
+2645, --Ghost Wolf
+--190456, -- Ignore Pain
+197690, --Defensive Stance
+102558, --Incarnation: Guardian of Ursoc
+5487, --Bear Form
+201940, --Protector of the Pack **MAJOR DEFENSIVE**
+
+51271, --Pillars of Frost
+
+783, --Travel Form
+197625, --Moonkin Form
+102543, --Incarnation: King of the Jungle
+106951, --Berserk
+768, --Cat Form
+102560, --Incarnation: Chosen of Elune
+194223, --Celestial Alignment
+117679, --Incarnation Tree of Life
+
+190319, --Combustion
 235313, --Blazing Barrier
 11426, --Ice Barrier
 235450, --Prismatic Barrier
 
---**Class Perm Passive Buffs **--
+194249, --Voidform
 
-2645, --Ghost Wolf
-197690, --Defensive Stance
-5487, --Bear Form
-201940, --Protector of the Pack
-204205, --Wild Protector
-768, --Cat Form
-783, --Travel Form
-24858, --Moonkin Form
-197625, --Moonkin Form
 199261, --Death Wish
+
+204205, --Wild Protector
 232698, --Shadowform
+24858, --Moonkin Form
 
 
 }
