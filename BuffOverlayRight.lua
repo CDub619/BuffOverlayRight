@@ -52,15 +52,20 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 --**Class Perm Passive Buffs & DMG CDs**--
 
+260402, -- Double Tap
+288613, -- True Shot
+
+114050, --Ascendance
+114051, --Ascendance
+191634, --Stormkeeper
+320137, --Stormkeeper
 2645, --Ghost Wolf
---190456, -- Ignore Pain
-197690, --Defensive Stance
-102558, --Incarnation: Guardian of Ursoc
-5487, --Bear Form
-201940, --Protector of the Pack **MAJOR DEFENSIVE**
+
 
 51271, --Pillars of Frost
 
+102558, --Incarnation: Guardian of Ursoc
+5487, --Bear Form
 783, --Travel Form
 197625, --Moonkin Form
 102543, --Incarnation: King of the Jungle
@@ -71,14 +76,29 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 117679, --Incarnation Tree of Life
 
 190319, --Combustion
+12042, --Arcane Power
+12472, --Icy Veins
 235313, --Blazing Barrier
 11426, --Ice Barrier
 235450, --Prismatic Barrier
 
+152173, --Serenity
+137639, --Storm, Earth, and Fire
+
 194249, --Voidform
 
+121471, --Shadow Blades
+
+113860, --Dark Soul: Instability
+113860, --Dark Soul: Misery
+
+107574, -- Avatar
+197690, --Defensive Stance
 199261, --Death Wish
 
+162264, --
+
+201940, --Protector of the Pack **MAJOR DEFENSIVE**
 204205, --Wild Protector
 232698, --Shadowform
 24858, --Moonkin Form
