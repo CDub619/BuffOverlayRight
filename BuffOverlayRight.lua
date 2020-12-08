@@ -27,7 +27,6 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 --**Secondary’s CD’s Given**--
 
-147833, --Intervene
 53480,  --Roar of Sacrifice
 212640, --Mending Bandage
 223685, --Safeguard
@@ -47,7 +46,6 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 19236, --Desperate Prayer
 277187, --Gladiator’s Emblem
-193065, --Masochism
 "Spirit Mend",
 
 --**Class Perm Passive Buffs & DMG CDs**--
@@ -96,8 +94,9 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 197690, --Defensive Stance
 199261, --Death Wish
 
-162264, --
+162264, -- Metamorphosis (Havoc)
 
+193065, --Masochism
 201940, --Protector of the Pack **MAJOR DEFENSIVE**
 204205, --Wild Protector
 232698, --Shadowform
