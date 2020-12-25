@@ -34,6 +34,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 207810, --Nether Bond
 291944, --Regeneration’
 59543, --Gift of the Naaru
+324867, --Fleshcraft (Necrolord)
 
 --**DMG/Heal CDs Given**--
 --**Threat MIsdirect Given**--
@@ -52,19 +53,27 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 260402, -- Double Tap
 288613, -- True Shot
+212704, --The Beast within
+193530, --Aspect of the Wild
+19574, --Bestial Wraith
 
+260881, --Spirit Wolf
+204262, --Spectral Recovery
+2645, --Ghost Wolf
 114050, --Ascendance
 114051, --Ascendance
 191634, --Stormkeeper
 320137, --Stormkeeper
-2645, --Ghost Wolf
-
 
 51271, --Pillars of Frost
 
+108293, --Heart of the Wild (Guardian)
 102558, --Incarnation: Guardian of Ursoc
 5487, --Bear Form
 783, --Travel Form
+108291, --Heart of the Wild (Boomy)
+108292, --Heart of the Wild (Feral)
+108294, --Heart of the Wild (Resto)
 197625, --Moonkin Form
 102543, --Incarnation: King of the Jungle
 106951, --Berserk
@@ -82,6 +91,9 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 152173, --Serenity
 137639, --Storm, Earth, and Fire
+
+231895, --Crusade
+152262, --Seraphim
 
 194249, --Voidform
 
@@ -101,6 +113,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 204205, --Wild Protector
 232698, --Shadowform
 24858, --Moonkin Form
+285933, --Demon Armor
 
 
 }
