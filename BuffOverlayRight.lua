@@ -34,6 +34,8 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 207810, --Nether Bond
 291944, --Regeneration’
 59543, --Gift of the Naaru
+332505, --Soulsteel Clamps
+332506, --Soulsteel Clamps
 324867, --Fleshcraft (Necrolord)
 
 --**DMG/Heal CDs Given**--
@@ -47,6 +49,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 19236, --Desperate Prayer
 277187, --Gladiator’s Emblem
+"Gladiator's Emblem",
 "Spirit Mend",
 
 --**Class Perm Passive Buffs & DMG CDs**--
@@ -60,6 +63,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 260881, --Spirit Wolf
 204262, --Spectral Recovery
 2645, --Ghost Wolf
+335903, --Doomwinds (shadowlands legendary)
 114050, --Ascendance
 114051, --Ascendance
 191634, --Stormkeeper
