@@ -1,6 +1,7 @@
 --On Git HUB
 local overlays = {}
 local buffs = {}
+local tblinsert = table.insert
 
 local prioritySpellList = { --The higher on the list, the higher priority the buff has.
 
@@ -68,6 +69,8 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 114051, --Ascendance
 191634, --Stormkeeper
 320137, --Stormkeeper
+--188616, --Shaman Earth Ele CLEU,
+--118323, --Shaman Primal Earth Ele CLEU,
 
 51271, --Pillars of Frost
 
@@ -85,10 +88,12 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 102560, --Incarnation: Chosen of Elune
 194223, --Celestial Alignment
 117679, --Incarnation Tree of Life
+--248280, --Trees CLEU
 
 190319, --Combustion
 12042, --Arcane Power
 12472, --Icy Veins
+321686, --Mirror Image CLEU,
 235313, --Blazing Barrier
 11426, --Ice Barrier
 235450, --Prismatic Barrier
@@ -122,9 +127,35 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 }
 
+local function CompactUnitFrame_UtilSetBuff(buffFrame, icon, duration, expirationTime, count)
+	buffFrame.icon:SetTexture(icon);
+	if ( count > 1 ) then
+		local countText = count;
+		if ( count >= 100 ) then
+			countText = BUFF_STACKS_OVERFLOW;
+		end
+		buffFrame.count:Show();
+		buffFrame.count:SetText(countText);
+	else
+		buffFrame.count:Hide();
+	end
+	local enabled = expirationTime and expirationTime ~= 0;
+	if enabled then
+		local startTime = expirationTime - duration;
+		CooldownFrame_Set(buffFrame.cooldown, startTime, duration, true);
+	else
+		CooldownFrame_Clear(buffFrame.cooldown);
+	end
+	buffFrame:Show();
+end
+
+
 for k, v in ipairs(prioritySpellList) do
 	buffs[v] = k
 end
+
+local CLEUAura = {}
+
 
 hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 	if self:IsForbidden() or not self:IsVisible() or not self.buffFrames then
@@ -132,6 +163,7 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 	end
 
 	local unit, index, buff = self.displayedUnit, index, buff
+	local sourceGUID, realm = UnitName(unit)
 	for i = 1, 32 do --BUFF_MAX_DISPLAY
 		local buffName, _, _, _, _, _, _, _, _, spellId = UnitBuff(unit, i,"HELPFUL")
 
@@ -150,25 +182,87 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 			break
 		end
 	end
-
+	local sourceGUID = UnitGUID(unit)
 	local overlay = overlays[self]
 	if not overlay then
-		if not index then
+		if not index and not CLEUAura[sourceGUID] then
 			return
 		end
 		overlay = CreateFrame("Button", "$parentBuffOverlayRight", self, "CompactAuraTemplate")
 		overlay:ClearAllPoints()
 		overlay:SetPoint("TOPRIGHT", self, "TOPRIGHT", -2, -1.5)
 		overlay:SetAlpha(1)
+		overlay:SetFrameLevel(100)
 		overlay:EnableMouse(false)
 		overlay:RegisterForClicks()
 		overlays[self] = overlay
 	end
 
-	if index then
+	if index or CLEUAura[sourceGUID] then
+		local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura
+		if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][5]]) then
+			icon = CLEUAura[sourceGUID][1][1]
+			duration = CLEUAura[sourceGUID][1][2]
+			expirationTime = CLEUAura[sourceGUID][1][3]
+			count = CLEUAura[sourceGUID][1][4]
+		else
+			name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(unit, index)
+		end
 		overlay:SetSize(self.buffFrames[1]:GetSize())
 		overlay:SetScale(1.15)
-		CompactUnitFrame_UtilSetBuff(overlay, index, UnitBuff(unit, index))
+		CompactUnitFrame_UtilSetBuff(overlay, icon, duration, expirationTime, count)
 	end
-	overlay:SetShown(index and true or false)
+	if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][5]]) then
+		local durationTime = CLEUAura[sourceGUID][1][3] - GetTime();
+		overlay:SetShown(true)
+		if durationTime > 0 then
+			C_Timer.After(durationTime, function()
+				overlay:SetShown(false)
+			end)
+		end
+	else
+		overlay:SetShown(index and true or false)
+	end
 end)
+
+
+local castedAuraIds = {
+	[321686] = 40, --Mirror Image
+	--[248280] = 10, --Trees
+	--[188616] = 60, --Shaman Earth Ele
+	--[118323] = 60, --Shaman Primal Earth Ele
+
+}
+
+local BORCLEU = CreateFrame("Frame")
+BORCLEU:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+BORCLEU:SetScript("OnEvent", function(self, event, ...)
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		BORCLEU:CLEU()
+	end
+end)
+
+
+function BORCLEU:CLEU()
+		local _, event, _, sourceGUID, _, sourceFlags, _, destGUID, destName, destFlags, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
+		if (event == "SPELL_SUMMON") or (event == "SPELL_CREATE") then --Summoned CDs
+			if castedAuraIds[spellId] then
+				local duration = castedAuraIds[spellId]
+				local _, _, icon = GetSpellInfo(spellId)
+				local expirationTime = GetTime() + duration
+				local count = 0
+				if spellId == 321686 then
+					icon = 135994
+				end
+				if not CLEUAura[sourceGUID] then
+					CLEUAura[sourceGUID] = {}
+				end
+				tblinsert (CLEUAura[sourceGUID], 1, {icon, duration, expirationTime, count, spellId})
+				C_Timer.After(duration, function()
+					if CLEUAura[sourceGUID] then
+						CLEUAura[sourceGUID] = nil
+					end
+				end)
+			end
+		end
+	end
