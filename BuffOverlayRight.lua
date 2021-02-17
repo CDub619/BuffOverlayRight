@@ -2,7 +2,8 @@
 local overlays = {}
 local buffs = {}
 local tblinsert = table.insert
-
+local tremove = table.remove
+local substring = string.sub
 local prioritySpellList = { --The higher on the list, the higher priority the buff has.
 
 --**Stealth Given**
@@ -200,19 +201,33 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 
 	if index or CLEUAura[sourceGUID] then
 		local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura
-		if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][5]]) then
-			icon = CLEUAura[sourceGUID][1][1]
-			duration = CLEUAura[sourceGUID][1][2]
-			expirationTime = CLEUAura[sourceGUID][1][3]
-			count = CLEUAura[sourceGUID][1][4]
-		else
-			name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(unit, index)
-		end
+			if CLEUAura[sourceGUID] then
+				if #CLEUAura[sourceGUID] >= 1 then
+					if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][4]]) then
+						for k, v in pairs(CLEUAura[sourceGUID]) do
+							icon = CLEUAura[sourceGUID][k][1]
+							duration = CLEUAura[sourceGUID][k][2]
+							expirationTime = CLEUAura[sourceGUID][k][3]
+							spellId = CLEUAura[sourceGUID][k][4]
+							if spellId == 321686 then
+								count = #CLEUAura[sourceGUID]
+							else
+								count = 0
+							end
+							if CLEUAura[sourceGUID][k] then
+								break
+							end
+						end
+					end
+				end
+			else
+				name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(unit, index)
+			end
 		overlay:SetSize(self.buffFrames[1]:GetSize())
 		overlay:SetScale(1.15)
 		CompactUnitFrame_UtilSetBuff(overlay, icon, duration, expirationTime, count)
 	end
-	if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][5]]) then
+	if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][4]]) then
 		local durationTime = CLEUAura[sourceGUID][1][3] - GetTime();
 		overlay:SetShown(true)
 		if durationTime > 0 then
@@ -228,11 +243,30 @@ end)
 
 local castedAuraIds = {
 	[321686] = 40, --Mirror Image
-	--[248280] = 10, --Trees
+	[248280] = 10, --Trees
 	--[188616] = 60, --Shaman Earth Ele
 	--[118323] = 60, --Shaman Primal Earth Ele
+	[123040] = 12, --Mindbender
+	[34433] = 15, --Disc Pet Summmon Sfiend "Shadowfiend" same Id has sourceGUID
 
 }
+
+local tip = CreateFrame('GameTooltip', 'GuardianOwnerTooltip', nil, 'GameTooltipTemplate')
+local function GetGuardianOwner(guid)
+  tip:SetOwner(WorldFrame, 'ANCHOR_NONE')
+  tip:SetHyperlink('unit:' .. guid or '')
+  local text = GuardianOwnerTooltipTextLeft2
+	local text1 = GuardianOwnerTooltipTextLeft3
+	if text1 and type(text1:GetText()) == "string" then
+		if strmatch(text1:GetText(), "Corpse") then
+			return "Corpse" --Only need for Earth Ele and Infernals
+		else
+			return strmatch(text and text:GetText() or '', "^([^%s-]+)")
+		end
+	else
+		return strmatch(text and text:GetText() or '', "^([^%s-]+)")
+	end
+end
 
 local BORCLEU = CreateFrame("Frame")
 BORCLEU:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -244,25 +278,55 @@ end)
 
 
 function BORCLEU:CLEU()
-		local _, event, _, sourceGUID, _, sourceFlags, _, destGUID, destName, destFlags, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
+		local _, event, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, _, spellId, _, _, _, _, spellSchool = CombatLogGetCurrentEventInfo()
 		if (event == "SPELL_SUMMON") or (event == "SPELL_CREATE") then --Summoned CDs
 			if castedAuraIds[spellId] then
 				local duration = castedAuraIds[spellId]
-				local _, _, icon = GetSpellInfo(spellId)
+				local namePrint, _, icon = GetSpellInfo(spellId)
 				local expirationTime = GetTime() + duration
-				local count = 0
+
 				if spellId == 321686 then
 					icon = 135994
 				end
+
+				print(sourceName.." Summoned "..namePrint.." "..substring(destGUID, -7).." for "..duration.." BOR")
+
 				if not CLEUAura[sourceGUID] then
 					CLEUAura[sourceGUID] = {}
 				end
-				tblinsert (CLEUAura[sourceGUID], 1, {icon, duration, expirationTime, count, spellId})
+				tblinsert (CLEUAura[sourceGUID], {icon, duration, expirationTime, spellId, destGUID})
 				C_Timer.After(duration, function()
 					if CLEUAura[sourceGUID] then
 						CLEUAura[sourceGUID] = nil
 					end
 				end)
+				self.ticker = C_Timer.NewTicker(0.5, function()
+					local name = GetSpellInfo(spellId)
+					if GetGuardianOwner(destGUID) then
+						if not strmatch(GetGuardianOwner(destGUID), 'Corpse') and not strmatch(GetGuardianOwner(destGUID), 'Level') then
+							--print(GetGuardianOwner(destGUID).." "..name.." Up BOR: "..expiration-GetTime())
+						else
+							if CLEUAura[sourceGUID] then
+								for k, v in pairs(CLEUAura[sourceGUID]) do
+									if CLEUAura[sourceGUID][k] then
+	                  if substring(v[5], -5) == substring(destGUID, -5) then --string.sub is to help witj Mirror Images bug
+	                    if strmatch(GetGuardianOwner(v[5]), 'Corpse') or strmatch(GetGuardianOwner(v[5]), 'Level') then
+	                  		CLEUAura[sourceGUID][k] = nil
+												tremove(CLEUAura[sourceGUID], k)
+	                      print(sourceName.." "..GetGuardianOwner(destGUID).." "..namePrint.." "..substring(v[5], -7).." left w/ "..string.format("%.2f", expirationTime-GetTime()).." BOR")
+	                      self.ticker:Cancel()
+												if #CLEUAura[sourceGUID] == 0 then
+												CLEUAura[sourceGUID] = nil
+												end
+												break
+	                    end
+	                  end
+									end
+                end
+							end
+						end
+					end
+				end, duration * 2)
 			end
 		end
 	end
