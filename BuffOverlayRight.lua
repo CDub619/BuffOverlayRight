@@ -61,6 +61,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 212704, --The Beast within
 193530, --Aspect of the Wild
 19574, --Bestial Wraith
+205691, --Dire Beast Basilisk
 
 260881, --Spirit Wolf
 204262, --Spectral Recovery
@@ -70,10 +71,15 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 114051, --Ascendance
 191634, --Stormkeeper
 320137, --Stormkeeper
---188616, --Shaman Earth Ele CLEU,
---118323, --Shaman Primal Earth Ele CLEU,
+188616, --Shaman Earth Ele "Greater Earth Elemental", has sourceGUID [summonid]
+118323, --Shaman Primal Earth Ele "Primal Earth Elemental", has sourceGUID [summonid]
+188592, --Shaman Fire Ele "Fire Elemental", has sourceGUID [summonid]
+118291, --Shaman Primal Fire Ele "Primal Fire Earth Elemental", has sourceGUID [summonid]
+157299, --Storm Ele , has sourceGUID [summonid]
 
+207289, --Unholy Assault
 51271, --Pillars of Frost
+288853, --Abomb
 
 108293, --Heart of the Wild (Guardian)
 102558, --Incarnation: Guardian of Ursoc
@@ -89,7 +95,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 102560, --Incarnation: Chosen of Elune
 194223, --Celestial Alignment
 117679, --Incarnation Tree of Life
---248280, --Trees CLEU
+248280, --Trees CLEU
 
 190319, --Combustion
 12042, --Arcane Power
@@ -99,7 +105,9 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 11426, --Ice Barrier
 235450, --Prismatic Barrier
 
+310454, --Weapons of Order
 152173, --Serenity
+123904,--WW Xuen Pet Summmon "Xuen" same Id has sourceGUID
 137639, --Storm, Earth, and Fire
 
 231895, --Crusade
@@ -111,6 +119,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 113860, --Dark Soul: Instability
 113860, --Dark Soul: Misery
+111685, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
 
 107574, -- Avatar
 197690, --Defensive Stance
@@ -119,6 +128,8 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 162264, -- Metamorphosis (Havoc)
 
 193065, --Masochism
+123040, --Disc Pet Summmon Mindbender
+34433, --Disc Pet Summmon Sfiend
 201940, --Protector of the Pack **MAJOR DEFENSIVE**
 204205, --Wild Protector
 232698, --Shadowform
@@ -199,26 +210,24 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 		overlays[self] = overlay
 	end
 
+	local cleu = false
+
 	if index or CLEUAura[sourceGUID] then
 		local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura
 			if CLEUAura[sourceGUID] then
-				if #CLEUAura[sourceGUID] >= 1 then
 					if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][4]]) then
-						for k, v in pairs(CLEUAura[sourceGUID]) do
-							icon = CLEUAura[sourceGUID][k][1]
-							duration = CLEUAura[sourceGUID][k][2]
-							expirationTime = CLEUAura[sourceGUID][k][3]
-							spellId = CLEUAura[sourceGUID][k][4]
-							if spellId == 321686 then
-								count = #CLEUAura[sourceGUID]
-							else
-								count = 0
-							end
-							if CLEUAura[sourceGUID][k] then
-								break
-							end
+						icon = CLEUAura[sourceGUID][1][1]
+						duration = CLEUAura[sourceGUID][1][2]
+						expirationTime = CLEUAura[sourceGUID][1][3]
+						spellId = CLEUAura[sourceGUID][1][4]
+						cleu = true
+						if spellId == 321686 or 248280 then
+							count = #CLEUAura[sourceGUID]
+						else
+							count = 0
 						end
-					end
+					else
+					name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(unit, index)
 				end
 			else
 				name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = UnitBuff(unit, index)
@@ -227,7 +236,8 @@ hooksecurefunc("CompactUnitFrame_UpdateAuras", function(self)
 		overlay:SetScale(1.15)
 		CompactUnitFrame_UtilSetBuff(overlay, icon, duration, expirationTime, count)
 	end
-	if (buffs[buff] == nil and CLEUAura[sourceGUID]) or (CLEUAura[sourceGUID] and buffs[buff] > buffs[CLEUAura[sourceGUID][1][4]]) then
+
+	if cleu then
 		local durationTime = CLEUAura[sourceGUID][1][3] - GetTime();
 		overlay:SetShown(true)
 		if durationTime > 0 then
@@ -244,10 +254,17 @@ end)
 local castedAuraIds = {
 	[321686] = 40, --Mirror Image
 	[248280] = 10, --Trees
-	--[188616] = 60, --Shaman Earth Ele
-	--[118323] = 60, --Shaman Primal Earth Ele
+	[188616] = 60, --Shaman Earth Ele "Greater Earth Elemental", has sourceGUID [summonid]
+	[118323] = 60, --Shaman Primal Earth Ele "Primal Earth Elemental", has sourceGUID [summonid]
+	[188592] = 60, --Shaman Fire Ele "Fire Elemental", has sourceGUID [summonid]
+	[118291] = 60, --Shaman Primal Fire Ele "Primal Fire Earth Elemental", has sourceGUID [summonid]
+	[157299] = 30, --Storm Ele , has sourceGUID [summonid]
+	[288853] = 25, --Dk Raise Abomination "Abomination" same Id has sourceGUID
+	[123904] = 24,--WW Xuen Pet Summmon "Xuen" same Id has sourceGUID
+	[111685] = 30, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
 	[123040] = 12, --Mindbender
 	[34433] = 15, --Disc Pet Summmon Sfiend "Shadowfiend" same Id has sourceGUID
+	[205691] = 30, --Dire Beast Basilisk
 
 }
 
@@ -289,6 +306,10 @@ function BORCLEU:CLEU()
 					icon = 135994
 				end
 
+				if spellId == 157299 then
+					icon = 2065626
+				end
+
 				print(sourceName.." Summoned "..namePrint.." "..substring(destGUID, -7).." for "..duration.." BOR")
 
 				if not CLEUAura[sourceGUID] then
@@ -302,27 +323,23 @@ function BORCLEU:CLEU()
 				end)
 				self.ticker = C_Timer.NewTicker(0.5, function()
 					local name = GetSpellInfo(spellId)
-					if GetGuardianOwner(destGUID) then
-						if not strmatch(GetGuardianOwner(destGUID), 'Corpse') and not strmatch(GetGuardianOwner(destGUID), 'Level') then
-							--print(GetGuardianOwner(destGUID).." "..name.." Up BOR: "..expiration-GetTime())
-						else
-							if CLEUAura[sourceGUID] then
-								for k, v in pairs(CLEUAura[sourceGUID]) do
-									if CLEUAura[sourceGUID][k] then
-	                  if substring(v[5], -5) == substring(destGUID, -5) then --string.sub is to help witj Mirror Images bug
-	                    if strmatch(GetGuardianOwner(v[5]), 'Corpse') or strmatch(GetGuardianOwner(v[5]), 'Level') then
-	                  		CLEUAura[sourceGUID][k] = nil
-												tremove(CLEUAura[sourceGUID], k)
-	                      print(sourceName.." "..GetGuardianOwner(destGUID).." "..namePrint.." "..substring(v[5], -7).." left w/ "..string.format("%.2f", expirationTime-GetTime()).." BOR")
-	                      self.ticker:Cancel()
-												if #CLEUAura[sourceGUID] == 0 then
-												CLEUAura[sourceGUID] = nil
-												end
-												break
-	                    end
+					if CLEUAura[sourceGUID] then
+						for k, v in pairs(CLEUAura[sourceGUID]) do
+							if CLEUAura[sourceGUID][k] then
+								if v[5] then
+	                if substring(v[5], -5) == substring(destGUID, -5) then --string.sub is to help witj Mirror Images bug
+	                  if strmatch(GetGuardianOwner(v[5]), 'Corpse') or strmatch(GetGuardianOwner(v[5]), 'Level') then
+	                		CLEUAura[sourceGUID][k] = nil
+											tremove(CLEUAura[sourceGUID], k)
+	                    print(sourceName.." "..GetGuardianOwner(v[5]).." "..namePrint.." "..substring(v[5], -7).." left w/ "..string.format("%.2f", expirationTime-GetTime()).." BOR")
+	                    self.ticker:Cancel()
+											if #CLEUAura[sourceGUID] == 0 then
+											CLEUAura[sourceGUID] = nil
+											end
+											break
 	                  end
-									end
-                end
+	                end
+								end
 							end
 						end
 					end
