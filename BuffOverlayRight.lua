@@ -120,6 +120,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 113860, --Dark Soul: Instability
 113860, --Dark Soul: Misery
 111685, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
+205180, --Warlock Darkglare
 
 107574, -- Avatar
 197690, --Defensive Stance
@@ -262,6 +263,7 @@ local castedAuraIds = {
 	[288853] = 25, --Dk Raise Abomination "Abomination" same Id has sourceGUID
 	[123904] = 24,--WW Xuen Pet Summmon "Xuen" same Id has sourceGUID
 	[111685] = 30, --Warlock Infernals,  has sourceGUID (spellId and Summons are different) [spellbookid]
+	[205180] = 20, --Warlock Darkglare
 	[123040] = 12, --Mindbender
 	[34433] = 15, --Disc Pet Summmon Sfiend "Shadowfiend" same Id has sourceGUID
 	[205691] = 30, --Dire Beast Basilisk
