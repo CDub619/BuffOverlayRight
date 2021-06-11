@@ -82,7 +82,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 288853, --Abomb
 
 108293, --Heart of the Wild (Guardian)
-102558, --Incarnation: Guardian of Ursoc
+--102558, --Incarnation: Guardian of Ursoc
 5487, --Bear Form
 783, --Travel Form
 108291, --Heart of the Wild (Boomy)
