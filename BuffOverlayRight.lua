@@ -15,6 +15,7 @@ local prioritySpellList = { --The higher on the list, the higher priority the bu
 
 "Stealth",
 199483, --Camouflage
+"Camouflage",
 5215, --Prowl
 110960, --Greater Invisibility
 "Invisibility",
